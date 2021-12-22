@@ -1,6 +1,7 @@
 export interface IRegisterModel{
     email: string,
     name: string,
+    photo?: FileList[];
     password: string,
     confirmPassword: string
 }

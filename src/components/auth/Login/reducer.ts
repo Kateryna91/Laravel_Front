@@ -8,14 +8,14 @@ const inialState : AuthState = {
 export const authReducer = (state=inialState, action: AuthAction) : AuthState => {
     switch(action.type) {
         
-        case AuthActionTypes.LOGIN: {
+        case AuthActionTypes.LOGIN: {//ловим екшн логін
             return {
                 ...state,
                  isAuth: true, 
                  user: action.payload
             }
         }
-        case AuthActionTypes.LOGOUT: {
+        case AuthActionTypes.LOGOUT: {//ловим екшн логаут
             return {
                 ...state,
                  isAuth: false, 

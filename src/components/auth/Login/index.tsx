@@ -1,11 +1,11 @@
-import { Form, FormikHelpers, FormikProvider, useFormik } from "formik";
-import React, { useState } from "react";
-import { ILoginModel, ILoginServerError } from "./types";
-import { LoginSchema } from "./validation";
-import { InputGroup } from "../../common/InputGroup";
-import { useActions } from "../../../hooks/useActions";
+import { useState } from "react";
+import { Form, FormikProvider, FormikHelpers, useFormik } from "formik";
+import {ILoginModel, ILoginErrors} from './types';
+import {LoginSchema} from './validation';
+import {InputGroup} from '../../common/InputGroup';
 import { useNavigate } from "react-router";
-
+import { useActions } from "../../../hooks/useActions";
+import EclipseWidget from '../../common/eclipse';
 
 const LoginPage = () => {
   const { LoginUser } = useActions();
@@ -19,26 +19,26 @@ const LoginPage = () => {
     invalid: ""
   };
 
-  const onHandleSubmit = async (values: ILoginModel, {setFieldError}: FormikHelpers<ILoginModel>) => {
-    console.log("Form submit: ", values);
+  
+  const onHandleSubmit = async (values: ILoginModel, { setFieldError }: FormikHelpers<ILoginModel>) => {
     try {
-      await LoginUser(values);
-      navigator("/");
-    }
-    catch (ex) {
-      const serverError = ex as ILoginServerError;
-      Object.entries(serverError).forEach(([key, value])=> {
-          if(Array.isArray(value))
-          {
-              let message = "";
-              value.forEach((item)=> { message+=`${item} `; });
-              setFieldError(key, message);
-              //console.log(key, message);
-          }
-      });
-      if(serverError.error)
-      {
-        setInvalid(serverError.error);
+      setLoading(true); // починаєм загрузку
+      await LoginUser(values); // кідаєм дані в екшн
+      await navigator("/"); // переходим на головну
+      await setLoading(false); // закінчуєм загрузку
+    } 
+    catch (errors) {
+      setLoading(false); // закінчуєм хибну загрузку
+      const serverErrors = errors as ILoginErrors; //витягуєм помилки згідно інтерфейсу ILoginError
+      const { password, invalid } = serverErrors; //створюєм змінні для перевірки
+
+      if (password !== undefined) { //перевіряємо чи є помилки для пароля
+        setFieldError("password", password[0]);
+      }
+      console.log(invalid.length);
+      
+      if (invalid !== undefined){ //перевіряємо чи є стороні помилки
+        setFieldError("invalid", invalid[0]);
       }
     }
   };
@@ -88,3 +88,7 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+function setLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}
+
